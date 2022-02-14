@@ -75,9 +75,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // get posts on timeline - user posts + followed users' posts
-router.get('/timeline/all', async (req, res) => {
+router.get('/timeline/:userId', async (req, res) => {
   try {
-    const currentUser = await User.findById(req.body.userId);
+    const currentUser = await User.findById(req.params.userId);
     const currentUserPosts = await Post.find({ userId: currentUser._id });
   
     // get posts made by the people the user follows
@@ -86,7 +86,7 @@ router.get('/timeline/all', async (req, res) => {
         Post.find({ userId: followedUserId }))
     );
   
-    const posts = currentUserPosts.concat(followedUsersPosts);
+    const posts = currentUserPosts.concat(...followedUsersPosts);
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json(err);
