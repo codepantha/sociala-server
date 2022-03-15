@@ -105,4 +105,21 @@ router.put("/:id/unfollow", async (req, res) => {
   }
 });
 
+// get friends (people you follow)
+router.get('/:id/friends', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+    const friends = await Promise.all(
+      user.following.map(friendId => User.findById(friendId))
+    );
+    // take only the _id, profilePic, and username
+    const friendList = friends.map(friend => (
+      {_id: friend._id, username: friend.username, profilePic: friend.profilePic})
+    )
+    res.status(200).json(friendList);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+})
+
 module.exports = router;
